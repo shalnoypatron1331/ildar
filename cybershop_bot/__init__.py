@@ -1,0 +1,1 @@
+"""CYBERSHOP Telegram Bot package."""
