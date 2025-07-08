@@ -2,8 +2,9 @@
 
 Skeleton project for a Telegram bot based on **aiogram 3**.
 
-This repository contains the initial structure and database setup. The bot will be
-implemented later.
+This repository contains a minimal implementation for collecting user requests
+and feedback. Submitted forms are stored in a SQLite database and notifications
+are delivered to managers and admins.
 
 ## Project structure
 
@@ -23,3 +24,15 @@ cybershop_bot/
 
 The bot stores data in an SQLite database using SQLAlchemy's asynchronous
 engine. Tables are created on start with `init_db()`.
+
+## Configuration
+
+Create a `.env` file based on `.env.example` and provide your bot token. In
+addition to `ADMIN_IDS`, specify `MANAGER_CHAT_ID` with the chat ID of the
+manager group where notifications should be sent.
+
+## Notifications
+
+When a user submits a form, the bot sends the formatted information to the
+manager chat and to each admin specified in `ADMIN_IDS`. Attachments are stored
+inside `media/` and reused for these notifications.
