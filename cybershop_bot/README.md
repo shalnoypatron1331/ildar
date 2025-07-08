@@ -36,3 +36,11 @@ manager group where notifications should be sent.
 When a user submits a form, the bot sends the formatted information to the
 manager chat and to each admin specified in `ADMIN_IDS`. Attachments are stored
 inside `media/` and reused for these notifications.
+
+## Installation
+
+Install the required packages using:
+
+```bash
+pip install -r requirements.txt
+```

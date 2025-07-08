@@ -1,8 +1,9 @@
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+import os
 
-# ЗАМЕНИ на свой токен
-TOKEN = "7718184681:AAGVXEc_xBNiBlAB87OSoQ9EYC0ZIn-XEFU"
+# Токен бота должен храниться в файле .env
+TOKEN = os.getenv("TOKEN")
 
 # Команда /start
 def start(update: Update, context: CallbackContext):
