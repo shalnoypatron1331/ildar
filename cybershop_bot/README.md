@@ -1,9 +1,10 @@
 # CYBERSHOP Telegram Bot
 
-Skeleton project for a Telegram bot based on **aiogram 3**.
+Telegram bot for the CYBERSHOP service built with **aiogram 3**.
 
-This repository contains the initial structure and database setup. The bot will be
-implemented later.
+The bot shows a main menu with inline buttons and collects data from users for
+service requests, trade-in, and warranty extension. All answers are stored in
+an SQLite database and logged to individual files in `logs/{user_id}`.
 
 ## Project structure
 
