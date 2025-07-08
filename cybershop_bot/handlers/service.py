@@ -1,6 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message
-from aiogram.filters import Command
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
@@ -12,6 +11,7 @@ from ..db.operations import (
 )
 from ..utils.notifications import send_notifications
 from ..config import Settings
+from ..keyboards.menu import to_menu_kb
 
 router = Router()
 
@@ -20,37 +20,47 @@ class ServiceForm(StatesGroup):
     name = State()
     contact = State()
     time = State()
-    category = State()
 
 
-@router.message(Command("service"))
-async def start_service(message: Message, state: FSMContext) -> None:
-    await message.answer("Введите ваше имя")
+@router.callback_query(F.data.in_({"maintenance", "upgrade"}))
+async def start_service(callback: CallbackQuery, state: FSMContext) -> None:
+    category = callback.data
+    await state.update_data(category=category)
+    await callback.message.delete()
+    await callback.message.answer("Введите ваше имя:")
     await state.set_state(ServiceForm.name)
+    await callback.answer()
 
 
 @router.message(ServiceForm.name)
 async def process_name(message: Message, state: FSMContext) -> None:
     await state.update_data(name=message.text)
-    await message.answer("Контакт (телефон или @username)")
+    await message.delete()
+    await message.answer("Укажите телефон или Telegram:")
     await state.set_state(ServiceForm.contact)
 
 
 @router.message(ServiceForm.contact)
 async def process_contact(message: Message, state: FSMContext) -> None:
     await state.update_data(contact=message.text)
-    await message.answer("Предпочтительное время")
+    await message.delete()
+    await message.answer("Когда с вами удобно связаться?")
     await state.set_state(ServiceForm.time)
 
 
 @router.message(ServiceForm.time)
-async def process_time(message: Message, state: FSMContext) -> None:
+async def process_time(
+    message: Message,
+    state: FSMContext,
+    session: AsyncSession,
+    bot,
+    settings: Settings,
+) -> None:
     await state.update_data(time=message.text)
-    await message.answer("Категория: maintenance или upgrade")
-    await state.set_state(ServiceForm.category)
+    await message.delete()
+    await finish_service(message, state, session, bot, settings)
 
 
-@router.message(ServiceForm.category)
 async def finish_service(
     message: Message,
     state: FSMContext,
@@ -58,7 +68,7 @@ async def finish_service(
     bot,
     settings: Settings,
 ) -> None:
-    data = await state.update_data(category=message.text)
+    data = await state.get_data()
     user = await get_or_create_user(session, message.from_user.id, message.from_user.username)
     req = await create_service_request(
         session,
@@ -76,5 +86,8 @@ async def finish_service(
         f"\U0001F194 TG ID: {message.from_user.id}"
     )
     await send_notifications(bot, text, settings)
-    await message.answer("\u2705 Спасибо! Ваша заявка передана. Мы свяжемся с вами в течение рабочего дня.")
+    await message.answer(
+        "\u2705 Спасибо! Ваша заявка принята. Мы свяжемся с вами в течение дня.",
+        reply_markup=to_menu_kb(),
+    )
     await state.clear()
