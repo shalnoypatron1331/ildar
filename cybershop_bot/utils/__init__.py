@@ -4,6 +4,7 @@ from .notifications import send_notifications
 from .storage import save_file
 from .db_middleware import DBSessionMiddleware
 from .settings_middleware import SettingsMiddleware
+from .auth import is_admin
 
 __all__ = [
     "logger",
@@ -13,4 +14,5 @@ __all__ = [
     "save_file",
     "DBSessionMiddleware",
     "SettingsMiddleware",
+    "is_admin",
 ]
