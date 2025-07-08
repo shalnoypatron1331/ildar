@@ -1,8 +1,8 @@
 from aiogram import Bot
-from dataclasses import dataclass
 from pathlib import Path
 
 from ..config import Settings
+from .logger import logger
 
 async def send_notifications(
     bot: Bot,
@@ -11,12 +11,17 @@ async def send_notifications(
     photo_path: str | None = None,
 ) -> None:
     """Send a message or photo to manager chat and all admins."""
+    targets = [settings.manager_chat_id, *settings.admin_ids]
     if photo_path:
-        with Path(photo_path).open('rb') as photo:
-            await bot.send_photo(settings.manager_chat_id, photo, caption=text)
-            for admin_id in settings.admin_ids:
-                await bot.send_photo(admin_id, photo, caption=text)
+        for chat_id in targets:
+            try:
+                with Path(photo_path).open("rb") as photo:
+                    await bot.send_photo(chat_id, photo, caption=text)
+            except Exception as e:
+                logger.error(f"Failed to send photo to {chat_id}: {e}")
     else:
-        await bot.send_message(settings.manager_chat_id, text)
-        for admin_id in settings.admin_ids:
-            await bot.send_message(admin_id, text)
+        for chat_id in targets:
+            try:
+                await bot.send_message(chat_id, text)
+            except Exception as e:
+                logger.error(f"Failed to send message to {chat_id}: {e}")
