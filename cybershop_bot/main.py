@@ -21,6 +21,8 @@ async def main() -> None:
     session_maker = get_session_maker(engine)
     dp.message.middleware(DBSessionMiddleware(session_maker))
     dp.message.middleware(SettingsMiddleware(settings))
+    dp.callback_query.middleware(DBSessionMiddleware(session_maker))
+    dp.callback_query.middleware(SettingsMiddleware(settings))
 
     register_handlers(dp)
 

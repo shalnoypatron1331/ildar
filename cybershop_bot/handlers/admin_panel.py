@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 
 from ..config import Settings
 from ..db.models import ServiceRequest, TradeInRequest, Feedback, User
+from ..utils import is_admin, log_user_action
 
 router = Router()
 
@@ -97,14 +98,33 @@ def next_item_kb(prefix: str, offset: int) -> InlineKeyboardMarkup:
 
 @router.message(Command("admin"))
 async def admin_menu(message: Message, settings: Settings) -> None:
-    if message.from_user.id not in settings.admin_ids:
+    if not is_admin(message.from_user.id, settings):
+        log_user_action(
+            message.from_user.id,
+            "❌ Несанкционированная попытка использовать /admin",
+            message.from_user.username,
+        )
         await message.delete()
+        await message.answer(
+            "🚫 Эта команда доступна только для администраторов.",
+        )
         return
-    await message.answer("\U0001F6E0 \u041f\u0430\u043d\u0435\u043b\u044c \u0430\u0434\u043c\u0438\u043d\u0438\u0441\u0442\u0440\u0430\u0442\u043e\u0440\u0430:", reply_markup=admin_main_kb())
+    await message.answer(
+        "\U0001F6E0 \u041f\u0430\u043d\u0435\u043b\u044c \u0430\u0434\u043c\u0438\u043d\u0438\u0441\u0442\u0440\u0430\u0442\u043e\u0440\u0430:",
+        reply_markup=admin_main_kb(),
+    )
+    return
 
 
 @router.callback_query(F.data == "admin_requests")
-async def requests_summary(callback: CallbackQuery, session: AsyncSession) -> None:
+async def requests_summary(
+    callback: CallbackQuery,
+    session: AsyncSession,
+    settings: Settings,
+) -> None:
+    if not is_admin(callback.from_user.id, settings):
+        await callback.answer()
+        return
     to_count = await count_service_requests(session, "maintenance")
     up_count = await count_service_requests(session, "upgrade")
     tr_count = await count_tradein_requests(session)
@@ -120,7 +140,14 @@ async def requests_summary(callback: CallbackQuery, session: AsyncSession) -> No
 
 
 @router.callback_query(F.data.in_({"cat_maintenance", "cat_upgrade", "cat_tradein"}))
-async def show_request(callback: CallbackQuery, session: AsyncSession) -> None:
+async def show_request(
+    callback: CallbackQuery,
+    session: AsyncSession,
+    settings: Settings,
+) -> None:
+    if not is_admin(callback.from_user.id, settings):
+        await callback.answer()
+        return
     data = callback.data
     offset = 0
     if data == "cat_maintenance":
@@ -158,7 +185,14 @@ async def show_request(callback: CallbackQuery, session: AsyncSession) -> None:
 
 
 @router.callback_query(F.data.startswith("next_"))
-async def next_request(callback: CallbackQuery, session: AsyncSession) -> None:
+async def next_request(
+    callback: CallbackQuery,
+    session: AsyncSession,
+    settings: Settings,
+) -> None:
+    if not is_admin(callback.from_user.id, settings):
+        await callback.answer()
+        return
     prefix, off = callback.data.split(":")
     offset = int(off)
 
@@ -207,7 +241,14 @@ async def next_request(callback: CallbackQuery, session: AsyncSession) -> None:
 
 
 @router.callback_query(F.data == "admin_feedback")
-async def show_first_feedback(callback: CallbackQuery, session: AsyncSession) -> None:
+async def show_first_feedback(
+    callback: CallbackQuery,
+    session: AsyncSession,
+    settings: Settings,
+) -> None:
+    if not is_admin(callback.from_user.id, settings):
+        await callback.answer()
+        return
     fb = await get_feedback(session, 0)
     if not fb:
         await callback.answer("\u041e\u0442\u0437\u044b\u0432\u043e\u0432 \u043d\u0435\u0442", show_alert=True)
@@ -223,7 +264,14 @@ async def show_first_feedback(callback: CallbackQuery, session: AsyncSession) ->
 
 
 @router.callback_query(F.data == "admin_stats")
-async def show_stats(callback: CallbackQuery, session: AsyncSession) -> None:
+async def show_stats(
+    callback: CallbackQuery,
+    session: AsyncSession,
+    settings: Settings,
+) -> None:
+    if not is_admin(callback.from_user.id, settings):
+        await callback.answer()
+        return
     users = await count_users(session)
     to_count = await count_service_requests(session, "maintenance")
     up_count = await count_service_requests(session, "upgrade")
