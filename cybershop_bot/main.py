@@ -3,12 +3,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from cybershop_bot.config import get_settings
-from db.database import get_engine, get_session_maker, init_db
-from utils.logger import logger
-from handlers import register_handlers
-from utils.db_middleware import DBSessionMiddleware
-from utils.settings_middleware import SettingsMiddleware
-from utils.logging_middleware import LoggingMiddleware
+from .db.database import get_engine, get_session_maker, init_db
+from .utils.logger import logger
+from .handlers import register_handlers
+from .utils.db_middleware import DBSessionMiddleware
+from .utils.settings_middleware import SettingsMiddleware
+from .utils.logging_middleware import LoggingMiddleware
 
 
 async def main() -> None:
