@@ -58,6 +58,12 @@ pip install -r requirements.txt
 python -m cybershop_bot.main
 ```
 
+The project targets **aiogram 3.7** and newer. Starting from this version the
+`Bot` initializer no longer accepts the `parse_mode` argument directly. Instead,
+`main.py` passes `default=DefaultBotProperties(parse_mode='HTML')` when creating
+the bot instance. Ensure you have an up to date `aiogram` installed so the bot
+runs without errors.
+
 ## Simple example
 
 For a minimal example using `python-telegram-bot`, see `bot_call.py` in the
