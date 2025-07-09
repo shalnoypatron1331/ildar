@@ -1,6 +1,7 @@
 from datetime import datetime
 from sqlalchemy import String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from typing import Optional
 
 class Base(DeclarativeBase):
     pass
@@ -10,14 +11,14 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     telegram_id: Mapped[int] = mapped_column(unique=True, index=True)
-    username: Mapped[str | None] = mapped_column(String(32))
+    username: Mapped[Optional[str]] = mapped_column(String(32))
     first_seen: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 class ServiceRequest(Base):
     __tablename__ = 'service_requests'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int | None] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[Optional[int]] = mapped_column(ForeignKey('users.id'))
     name: Mapped[str] = mapped_column(String(100))
     phone: Mapped[str] = mapped_column(String(32))
     preferred_time: Mapped[str] = mapped_column(String(100))

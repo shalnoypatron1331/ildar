@@ -3,6 +3,7 @@ from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKe
 from aiogram.filters import Command
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func, select
+from typing import Optional
 
 from ..config import Settings
 from ..db.models import ServiceRequest, TradeInRequest, Feedback, User
@@ -12,7 +13,7 @@ router = Router()
 
 
 # --- Helper database functions ---
-async def count_service_requests(session: AsyncSession, category: str | None = None) -> int:
+async def count_service_requests(session: AsyncSession, category: Optional[str] = None) -> int:
     stmt = select(func.count()).select_from(ServiceRequest)
     if category:
         stmt = stmt.where(ServiceRequest.category == category)
