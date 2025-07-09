@@ -3,12 +3,13 @@ from pathlib import Path
 
 from ..config import Settings
 from .logger import logger
+from typing import Optional
 
 async def send_notifications(
     bot: Bot,
     text: str,
     settings: Settings,
-    photo_path: str | None = None,
+    photo_path: Optional[str] = None,
 ) -> None:
     """Send a message or photo to manager chat and all admins."""
     targets = [settings.manager_chat_id, *settings.admin_ids]

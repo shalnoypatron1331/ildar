@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from os import getenv
 from pathlib import Path
+from typing import List
+
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -10,7 +12,7 @@ load_dotenv(BASE_DIR / '.env')
 class Settings:
     token: str
     db_path: str
-    admin_ids: list[int]
+    admin_ids: List[int]
     manager_chat_id: int
 
 
