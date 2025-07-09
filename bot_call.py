@@ -1,9 +1,17 @@
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
-# Токен бота должен храниться в файле .env
+# Load environment variables from .env located next to this script
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / '.env')
+
+# The bot token is read from the environment
 TOKEN = os.getenv("TOKEN")
+if not TOKEN:
+    raise RuntimeError("TOKEN not provided in .env")
 
 # Команда /start
 def start(update: Update, context: CallbackContext):

@@ -57,3 +57,13 @@ pip install -r requirements.txt
 ```bash
 python -m cybershop_bot.main
 ```
+
+## Simple example
+
+For a minimal example using `python-telegram-bot`, see `bot_call.py` in the
+project root. Copy `.env.example` from the root directory to `.env` and fill in
+the variables there as well. Then run:
+
+```bash
+python bot_call.py
+```
