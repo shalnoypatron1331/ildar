@@ -44,3 +44,16 @@ Install the required packages using:
 ```bash
 pip install -r requirements.txt
 ```
+
+## Running the bot
+
+1. Copy `.env.example` to `.env` and fill in the variables:
+   - `TOKEN` — Telegram bot token
+   - `ADMIN_IDS` — comma separated list of admin Telegram IDs
+   - `MANAGER_CHAT_ID` — ID of the manager group chat
+
+2. Launch the bot using:
+
+```bash
+python -m cybershop_bot.main
+```
