@@ -1,5 +1,6 @@
 import asyncio
 from aiogram import Bot, Dispatcher
+from aiogram.client.bot import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from cybershop_bot.config import get_settings
@@ -16,7 +17,7 @@ async def main() -> None:
     engine = get_engine(settings.db_path)
     await init_db(engine)
 
-    bot = Bot(settings.token, parse_mode='HTML')
+    bot = Bot(settings.token, default=DefaultBotProperties(parse_mode='HTML'))
     dp = Dispatcher(storage=MemoryStorage())
 
     session_maker = get_session_maker(engine)
