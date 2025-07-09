@@ -1,7 +1,7 @@
 from aiogram import Bot
 from pathlib import Path
 
-from ..config import Settings
+from cybershop_bot.config import Settings
 from .logger import logger
 from typing import Optional
 

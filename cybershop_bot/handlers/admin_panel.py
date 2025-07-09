@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func, select
 from typing import Optional
 
-from ..config import Settings
+from cybershop_bot.config import Settings
 from ..db.models import ServiceRequest, TradeInRequest, Feedback, User
 from ..utils import is_admin, log_user_action
 

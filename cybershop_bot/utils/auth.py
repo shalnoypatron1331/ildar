@@ -1,4 +1,4 @@
-from ..config import Settings
+from cybershop_bot.config import Settings
 
 
 def is_admin(user_id: int, settings: Settings) -> bool:
