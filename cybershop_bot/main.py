@@ -2,7 +2,7 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from config import get_settings
+from cybershop_bot.config import get_settings
 from db.database import get_engine, get_session_maker, init_db
 from utils.logger import logger
 from handlers import register_handlers

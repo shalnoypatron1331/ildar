@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..db.operations import create_feedback
 from ..utils.storage import save_file
 from ..utils.notifications import send_notifications
-from ..config import Settings
+from cybershop_bot.config import Settings
 from ..keyboards.menu import to_menu_kb
 
 router = Router()

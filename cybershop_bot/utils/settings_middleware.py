@@ -2,7 +2,7 @@ from typing import Callable, Awaitable, Any, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 
-from ..config import Settings
+from cybershop_bot.config import Settings
 
 
 class SettingsMiddleware(BaseMiddleware):

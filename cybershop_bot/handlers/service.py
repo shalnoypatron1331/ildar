@@ -10,7 +10,7 @@ from ..db.operations import (
     create_service_request,
 )
 from ..utils.notifications import send_notifications
-from ..config import Settings
+from cybershop_bot.config import Settings
 from ..keyboards.menu import to_menu_kb
 
 router = Router()
