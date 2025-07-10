@@ -72,7 +72,7 @@ def feedback_kb() -> InlineKeyboardMarkup:
 def location_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="\U0001F5FA \u041e\u0442\u043a\u0440\u044b\u0442\u044c \u043d\u0430 \u042f\u043d\u0434\u0435\u043a\u0441.\u041a\u0430\u0440\u0442\u0430\u0445", url="https://yandex.ru/maps/?text=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0%2C%20%D1%83%D0%BB.%20%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D0%BD%D0%B0%D1%8F%2C%205" )],
+            [InlineKeyboardButton(text="\U0001F5FA \u041e\u0442\u043a\u0440\u044b\u0442\u044c \u043d\u0430 \u042f\u043d\u0434\u0435\u043a\u0441.\u041a\u0430\u0440\u0442\u0430\u0445", url="https://yandex.ru/maps/-/CHw0646T")],
             [InlineKeyboardButton(text="\U0001F4CB \u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0430\u0434\u0440\u0435\u0441", callback_data="copy_addr")],
             [InlineKeyboardButton(text="\u21a9\ufe0f \u041d\u0430\u0437\u0430\u0434", callback_data="menu")],
         ]
