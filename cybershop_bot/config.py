@@ -14,6 +14,9 @@ class Settings:
     db_path: str
     admin_ids: List[int]
     manager_chat_id: int
+    manager_username: str
+    manager_phone: str
+    support_username: str
 
 
 def get_settings() -> Settings:
@@ -21,9 +24,15 @@ def get_settings() -> Settings:
     db_path = getenv('DB_PATH', 'cybershop.db')
     admin_ids = [int(x) for x in getenv('ADMIN_IDS', '').split(',') if x]
     manager_chat_id = int(getenv('MANAGER_CHAT_ID', '0'))
+    manager_username = getenv('MANAGER_USERNAME', 'cybershop_manager')
+    manager_phone = getenv('MANAGER_PHONE', '+7 (999) 123-45-67')
+    support_username = getenv('SUPPORT_USERNAME', 'cybershop_support')
     return Settings(
         token=token,
         db_path=db_path,
         admin_ids=admin_ids,
         manager_chat_id=manager_chat_id,
+        manager_username=manager_username,
+        manager_phone=manager_phone,
+        support_username=support_username,
     )

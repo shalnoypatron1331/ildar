@@ -21,7 +21,7 @@ def main_menu_kb() -> InlineKeyboardMarkup:
                 InlineKeyboardButton(text="\U0001F381 \u0423\u0432\u0435\u043b\u0438\u0447\u0438\u0442\u044c \u0433\u0430\u0440\u0430\u043d\u0442\u0438\u044e", callback_data="feedback"),
                 InlineKeyboardButton(text="\U0001F5FA \u041a\u0430\u043a \u0434\u043e\u0431\u0440\u0430\u0442\u044c\u0441\u044f", callback_data="location"),
             ],
-            [InlineKeyboardButton(text="\U0001F4E2 \u0421\u0432\u044f\u0437\u0430\u0442\u044c\u0441\u044f \u0441 \u0447\u0435\u043b\u043e\u0432\u0435\u043a\u043e\u043c", callback_data="contact")],
+            [InlineKeyboardButton(text="\U0001F4E2 \u0421\u0432\u044f\u0437\u0430\u0442\u044c\u0441\u044f \u0441 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u043e\u043c", callback_data="contact_manager")],
         ]
     )
 
@@ -105,4 +105,30 @@ def manual_contact_kb() -> InlineKeyboardMarkup:
 def back_menu_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(text="\u21a9\ufe0f \u041d\u0430\u0437\u0430\u0434", callback_data="menu")]]
+    )
+
+
+def cancel_kb() -> InlineKeyboardMarkup:
+    """Keyboard with a single cancel button."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="\u274C \u041e\u0442\u043c\u0435\u043d\u0430 / \u041d\u0430\u0437\u0430\u0434", callback_data="cancel_form")]
+        ]
+    )
+
+
+def with_cancel(kb: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
+    """Return a copy of given keyboard with a cancel button appended."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=kb.inline_keyboard + cancel_kb().inline_keyboard
+    )
+
+
+def contact_manager_kb(username: str) -> InlineKeyboardMarkup:
+    """Buttons for contacting the manager."""
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="\U0001F4E7 \u041d\u0430\u043f\u0438\u0441\u0430\u0442\u044c \u0432 Telegram", url=f"https://t.me/{username}")],
+            [InlineKeyboardButton(text="\ud83d\udd19 \u041d\u0430\u0437\u0430\u0434", callback_data="back_to_menu")],
+        ]
     )

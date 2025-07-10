@@ -11,7 +11,13 @@ from ..db.operations import (
 )
 from ..utils.notifications import send_notifications
 from cybershop_bot.config import Settings
-from ..keyboards.menu import to_menu_kb, contact_choice_kb, manual_contact_kb
+from ..keyboards.menu import (
+    to_menu_kb,
+    contact_choice_kb,
+    manual_contact_kb,
+    cancel_kb,
+    with_cancel,
+)
 from ..keyboards.time import generate_time_slots
 
 router = Router()
@@ -28,7 +34,7 @@ async def start_service(callback: CallbackQuery, state: FSMContext) -> None:
     category = callback.data
     await state.update_data(category=category)
     await callback.message.delete()
-    await callback.message.answer("Введите ваше имя:")
+    await callback.message.answer("Введите ваше имя:", reply_markup=cancel_kb())
     await state.set_state(ServiceForm.name)
     await callback.answer()
 
@@ -39,7 +45,7 @@ async def process_name(message: Message, state: FSMContext) -> None:
     await message.delete()
     await message.answer(
         "\U0001F4F1 \u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0435 \u043a\u043e\u043d\u0442\u0430\u043a\u0442 \u0434\u043b\u044f \u0441\u0432\u044f\u0437\u0438:",
-        reply_markup=contact_choice_kb(),
+        reply_markup=with_cancel(contact_choice_kb()),
     )
     await state.set_state(ServiceForm.contact)
 
@@ -54,7 +60,7 @@ async def autofill_contact(
     await callback.message.delete()
     await callback.message.answer(
         "\u23F0 \u041a\u043e\u0433\u0434\u0430 \u0432\u0430\u043c \u0443\u0434\u043e\u0431\u043d\u043e, \u0447\u0442\u043e\u0431\u044b \u043c\u044b \u0441 \u0432\u0430\u043c\u0438 \u0441\u0432\u044f\u0437\u0430\u043b\u0438\u0441\u044c?\n\n\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0443\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u043d\u0438\u0436\u0435:",
-        reply_markup=generate_time_slots(),
+        reply_markup=with_cancel(generate_time_slots()),
     )
     await state.set_state(ServiceForm.time)
     await callback.answer()
@@ -63,7 +69,8 @@ async def autofill_contact(
 @router.callback_query(ServiceForm.contact, F.data == "enter_contact")
 async def ask_manual_contact(callback: CallbackQuery) -> None:
     await callback.message.edit_text(
-        "Укажите телефон или Telegram:", reply_markup=manual_contact_kb()
+        "Укажите телефон или Telegram:",
+        reply_markup=with_cancel(manual_contact_kb()),
     )
     await callback.answer()
 
@@ -74,7 +81,7 @@ async def process_contact(message: Message, state: FSMContext) -> None:
     await message.delete()
     await message.answer(
         "\u23F0 \u041a\u043e\u0433\u0434\u0430 \u0432\u0430\u043c \u0443\u0434\u043e\u0431\u043d\u043e, \u0447\u0442\u043e\u0431\u044b \u043c\u044b \u0441 \u0432\u0430\u043c\u0438 \u0441\u0432\u044f\u0437\u0430\u043b\u0438\u0441\u044c?\n\n\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0443\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u043d\u0438\u0436\u0435:",
-        reply_markup=generate_time_slots(),
+        reply_markup=with_cancel(generate_time_slots()),
     )
     await state.set_state(ServiceForm.time)
 

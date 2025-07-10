@@ -9,7 +9,13 @@ from ..db.operations import create_tradein_request
 from ..utils.storage import save_file
 from ..utils.notifications import send_notifications
 from cybershop_bot.config import Settings
-from ..keyboards.menu import to_menu_kb, contact_choice_kb, manual_contact_kb
+from ..keyboards.menu import (
+    to_menu_kb,
+    contact_choice_kb,
+    manual_contact_kb,
+    cancel_kb,
+    with_cancel,
+)
 
 router = Router()
 
@@ -25,7 +31,7 @@ class TradeInForm(StatesGroup):
 @router.callback_query(F.data == "tradein_form")
 async def start_tradein(callback: CallbackQuery, state: FSMContext) -> None:
     await callback.message.delete()
-    await callback.message.answer("Производитель:")
+    await callback.message.answer("Производитель:", reply_markup=cancel_kb())
     await state.set_state(TradeInForm.brand)
     await callback.answer()
 
@@ -34,7 +40,7 @@ async def start_tradein(callback: CallbackQuery, state: FSMContext) -> None:
 async def process_brand(message: Message, state: FSMContext) -> None:
     await state.update_data(brand=message.text)
     await message.delete()
-    await message.answer("Модель:")
+    await message.answer("Модель:", reply_markup=cancel_kb())
     await state.set_state(TradeInForm.model)
 
 
@@ -42,7 +48,7 @@ async def process_brand(message: Message, state: FSMContext) -> None:
 async def process_model(message: Message, state: FSMContext) -> None:
     await state.update_data(model=message.text)
     await message.delete()
-    await message.answer("Фото 1 (внешний вид)")
+    await message.answer("Фото 1 (внешний вид)", reply_markup=cancel_kb())
     await state.set_state(TradeInForm.photo1)
 
 
@@ -57,7 +63,7 @@ async def process_photo1(message: Message, state: FSMContext) -> None:
     path = save_file(downloaded, filename, 'tradein')
     await state.update_data(photo1=path)
     await message.delete()
-    await message.answer("Фото 2 (наклейка на дне)")
+    await message.answer("Фото 2 (наклейка на дне)", reply_markup=cancel_kb())
     await state.set_state(TradeInForm.photo2)
 
 
@@ -74,7 +80,7 @@ async def process_photo2(message: Message, state: FSMContext) -> None:
     await message.delete()
     await message.answer(
         "\U0001F4F1 \u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0435 \u043a\u043e\u043d\u0442\u0430\u043a\u0442 \u0434\u043b\u044f \u0441\u0432\u044f\u0437\u0438:",
-        reply_markup=contact_choice_kb(),
+        reply_markup=with_cancel(contact_choice_kb()),
     )
     await state.set_state(TradeInForm.contact)
 
@@ -98,7 +104,8 @@ async def autofill_contact_tradein(
 @router.callback_query(TradeInForm.contact, F.data == "enter_contact")
 async def ask_manual_contact_tradein(callback: CallbackQuery) -> None:
     await callback.message.edit_text(
-        "Телефон или Telegram для связи:", reply_markup=manual_contact_kb()
+        "Телефон или Telegram для связи:",
+        reply_markup=with_cancel(manual_contact_kb()),
     )
     await callback.answer()
 
