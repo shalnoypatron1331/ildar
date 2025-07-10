@@ -91,3 +91,15 @@ def contact_choice_kb() -> InlineKeyboardMarkup:
             [InlineKeyboardButton(text="\u270D\uFE0F \u0412\u0432\u0435\u0441\u0442\u0438 \u0432\u0440\u0443\u0447\u043d\u0443\u044e", callback_data="enter_contact")],
         ]
     )
+
+
+def manual_contact_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(text="\U0001F4CE \u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u043c\u043e\u0439 \u043d\u0438\u043a", callback_data="use_username")]]
+    )
+
+
+def back_menu_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[[InlineKeyboardButton(text="\u21a9\ufe0f \u041d\u0430\u0437\u0430\u0434", callback_data="menu")]]
+    )

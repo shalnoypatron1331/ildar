@@ -9,9 +9,17 @@ from ..db.operations import create_feedback
 from ..utils.storage import save_file
 from ..utils.notifications import send_notifications
 from cybershop_bot.config import Settings
-from ..keyboards.menu import to_menu_kb, contact_choice_kb
+from ..keyboards.menu import to_menu_kb, contact_choice_kb, manual_contact_kb, back_menu_kb
 
 router = Router()
+
+FEEDBACK_THANKS = (
+    "\U0001F4CC \u0411\u043b\u0430\u0433\u043e\u0434\u0430\u0440\u0438\u043c \u0437\u0430 \u043e\u0442\u0437\u044b\u0432!\n\n"
+    "\u041e\u0441\u0442\u0430\u043b\u0438\u0441\u044c \u0432\u043e\u043f\u0440\u043e\u0441\u044b?\n"
+    "\U0001F9D1\u200D\U0001F4BB \u041d\u0430\u043f\u0438\u0448\u0438\u0442\u0435 \u043d\u0430\u043c: @CyberShop7\n"
+    "\U0001F4DE \u041f\u043e\u0437\u0432\u043e\u043d\u0438\u0442\u0435: +7 977 756-92-68 (\u0418\u043b\u044c\u0434\u0430\u0440)\n"
+    "\U0001F4DE \u0418\u043b\u0438: +7 977 296-12-74 (\u0410\u043b\u044c\u0431\u0435\u0440\u0442)"
+)
 
 
 class FeedbackForm(StatesGroup):
@@ -63,14 +71,8 @@ async def autofill_contact_feedback(
     settings: Settings,
 ) -> None:
     username = callback.from_user.username
-    if not username:
-        await callback.message.edit_text(
-            "\u2757 \u0423 \u0432\u0430\u0441 \u043d\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d username \u0432 Telegram. \u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u0432\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0440\u0443\u0447\u043d\u043e.",
-            reply_markup=None,
-        )
-        await callback.answer()
-        return
-    await state.update_data(contact=f"@{username}")
+    contact = f"@{username}" if username else str(callback.from_user.id)
+    await state.update_data(contact=contact)
     await callback.message.delete()
     await _finalize_feedback(callback.message, state, session, bot, settings)
     await callback.answer()
@@ -78,7 +80,9 @@ async def autofill_contact_feedback(
 
 @router.callback_query(FeedbackForm.contact, F.data == "enter_contact")
 async def ask_manual_contact_feedback(callback: CallbackQuery) -> None:
-    await callback.message.edit_text("Телефон или Telegram:")
+    await callback.message.edit_text(
+        "Телефон или Telegram:", reply_markup=manual_contact_kb()
+    )
     await callback.answer()
 
 
@@ -117,7 +121,4 @@ async def _finalize_feedback(
     )
     await send_notifications(bot, text, settings, photo_path=fb.screenshot)
     await state.clear()
-    await message.answer(
-        "\u2705 Спасибо! Ваша заявка принята. Мы свяжемся с вами в течение дня.",
-        reply_markup=to_menu_kb(),
-    )
+    await message.answer(FEEDBACK_THANKS, reply_markup=back_menu_kb())
