@@ -16,7 +16,7 @@ def generate_time_slots(start: str = "10:00", end: str = "18:30", step: int = 30
                 callback_data=f"time_{time_str.replace(':', '_')}"
             )
         )
-        if len(row) == 3:
+        if len(row) == 2:
             buttons.append(row)
             row = []
         current += timedelta(minutes=step)

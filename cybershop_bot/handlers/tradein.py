@@ -9,7 +9,7 @@ from ..db.operations import create_tradein_request
 from ..utils.storage import save_file
 from ..utils.notifications import send_notifications
 from cybershop_bot.config import Settings
-from ..keyboards.menu import to_menu_kb, contact_choice_kb
+from ..keyboards.menu import to_menu_kb, contact_choice_kb, manual_contact_kb
 
 router = Router()
 
@@ -88,14 +88,8 @@ async def autofill_contact_tradein(
     settings: Settings,
 ) -> None:
     username = callback.from_user.username
-    if not username:
-        await callback.message.edit_text(
-            "\u2757 \u0423 \u0432\u0430\u0441 \u043d\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d username \u0432 Telegram. \u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u0432\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0440\u0443\u0447\u043d\u043e.",
-            reply_markup=None,
-        )
-        await callback.answer()
-        return
-    await state.update_data(contact=f"@{username}")
+    contact = f"@{username}" if username else str(callback.from_user.id)
+    await state.update_data(contact=contact)
     await callback.message.delete()
     await _finalize_tradein(callback.message, state, session, bot, settings)
     await callback.answer()
@@ -103,7 +97,9 @@ async def autofill_contact_tradein(
 
 @router.callback_query(TradeInForm.contact, F.data == "enter_contact")
 async def ask_manual_contact_tradein(callback: CallbackQuery) -> None:
-    await callback.message.edit_text("Телефон или Telegram для связи:")
+    await callback.message.edit_text(
+        "Телефон или Telegram для связи:", reply_markup=manual_contact_kb()
+    )
     await callback.answer()
 
 
