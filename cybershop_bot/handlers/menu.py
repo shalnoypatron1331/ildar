@@ -9,7 +9,7 @@ from ..keyboards.menu import (
     tradein_kb,
     feedback_kb,
     location_kb,
-    contact_manager_kb,
+    back_menu_kb,
     to_menu_kb,
     back_service_kb,
     heat_info_kb,
@@ -78,14 +78,7 @@ ADDRESS_TEXT = (
 LOCATION_TEXT = (
     "\U0001F4CD \u041c\u044b \u043d\u0430\u0445\u043e\u0434\u0438\u043c\u0441\u044f \u043f\u043e \u0430\u0434\u0440\u0435\u0441\u0443:\n" + ADDRESS_TEXT
 )
-CONTACT_TEMPLATE = (
-    "\U0001F4F2 \u0421\u0432\u044f\u0437\u044c \u0441 \u043c\u0435\u043d\u0435\u0434\u0436\u0435\u0440\u043e\u043c:\n\n"
-    "\u0412\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u043d\u0430\u043f\u0438\u0441\u0430\u0442\u044c \u043d\u0430\u043f\u0440\u044f\u043c\u0443:\n"
-    "\u2014 Telegram: @{manager}\n"
-    "\u2014 \u0422\u0435\u043b\u0435\u0444\u043e\u043d: {phone}\n"
-    "\u2014 \u0427\u0430\u0442 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0438: @{support}\n\n"
-    "\U0001F559 \u0412\u0440\u0435\u043c\u044F \u0440\u0430\u0431\u043e\u0442\u044b: \u0435\u0436\u0435\u0434\u043d\u0435\u0432\u043d\u043e \u0441 10:00 \u0434\u043e 20:00"
-)
+CONTACT_TEXT = "Напишите нам напрямую — @{support}"
 
 
 @router.message(Command("start"))
@@ -140,14 +133,10 @@ async def location_info(callback: CallbackQuery) -> None:
 
 @router.callback_query(F.data == "contact_manager")
 async def contact_manager(callback: CallbackQuery, settings: Settings) -> None:
-    text = CONTACT_TEMPLATE.format(
-        manager=settings.manager_username,
-        phone=settings.manager_phone,
-        support=settings.support_username,
-    )
+    text = CONTACT_TEXT.format(support=settings.support_username)
     await callback.message.edit_text(
         text,
-        reply_markup=contact_manager_kb(settings.manager_username),
+        reply_markup=back_menu_kb(),
     )
     await callback.answer()
 
