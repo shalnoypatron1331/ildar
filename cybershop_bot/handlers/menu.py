@@ -86,8 +86,9 @@ CONTACT_TEXT = (
 
 @router.message(Command("start"))
 async def cmd_start(message: Message) -> None:
+    if message.chat.type == "private":
+        await message.delete()
     await message.answer(WELCOME_TEXT, reply_markup=start_kb())
-    await message.delete()
 
 
 @router.callback_query(F.data == "menu")
