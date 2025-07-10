@@ -12,6 +12,7 @@ from ..db.operations import (
 from ..utils.notifications import send_notifications
 from cybershop_bot.config import Settings
 from ..keyboards.menu import to_menu_kb
+from ..keyboards.time_slots import generate_time_slots
 
 router = Router()
 
@@ -44,21 +45,26 @@ async def process_name(message: Message, state: FSMContext) -> None:
 async def process_contact(message: Message, state: FSMContext) -> None:
     await state.update_data(contact=message.text)
     await message.delete()
-    await message.answer("Когда с вами удобно связаться?")
+    await message.answer(
+        "Когда с вами удобно связаться?\nВыберите удобное время ниже:",
+        reply_markup=generate_time_slots(),
+    )
     await state.set_state(ServiceForm.time)
 
 
-@router.message(ServiceForm.time)
+@router.callback_query(ServiceForm.time, F.data.startswith("time_"))
 async def process_time(
-    message: Message,
+    callback: CallbackQuery,
     state: FSMContext,
     session: AsyncSession,
     bot,
     settings: Settings,
 ) -> None:
-    await state.update_data(time=message.text)
-    await message.delete()
-    await finish_service(message, state, session, bot, settings)
+    time_str = callback.data.split("_", 1)[1].replace("_", ":")
+    await state.update_data(time=time_str)
+    await callback.message.edit_text(f"Вы выбрали время: {time_str}")
+    await callback.answer()
+    await finish_service(callback.message, state, session, bot, settings)
 
 
 async def finish_service(
