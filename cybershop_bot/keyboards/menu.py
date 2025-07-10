@@ -2,8 +2,11 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 def start_kb() -> InlineKeyboardMarkup:
+    """Keyboard with a single "Start" button."""
     return InlineKeyboardMarkup(
-        inline_keyboard=[[InlineKeyboardButton(text="\U0001F680 \u041d\u0430\u0447\u0430\u0442\u044c", callback_data="menu")]]
+        inline_keyboard=[
+            [InlineKeyboardButton(text="\u25B6\uFE0F \u041d\u0430\u0447\u0430\u0442\u044c", callback_data="menu")]
+        ]
     )
 
 
