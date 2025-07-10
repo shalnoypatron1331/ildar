@@ -11,7 +11,7 @@ from ..db.operations import (
 )
 from ..utils.notifications import send_notifications
 from cybershop_bot.config import Settings
-from ..keyboards.menu import to_menu_kb
+from ..keyboards.menu import to_menu_kb, contact_choice_kb
 
 router = Router()
 
@@ -36,8 +36,35 @@ async def start_service(callback: CallbackQuery, state: FSMContext) -> None:
 async def process_name(message: Message, state: FSMContext) -> None:
     await state.update_data(name=message.text)
     await message.delete()
-    await message.answer("Укажите телефон или Telegram:")
+    await message.answer(
+        "\U0001F4F1 \u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0435 \u043a\u043e\u043d\u0442\u0430\u043a\u0442 \u0434\u043b\u044f \u0441\u0432\u044f\u0437\u0438:",
+        reply_markup=contact_choice_kb(),
+    )
     await state.set_state(ServiceForm.contact)
+
+
+@router.callback_query(ServiceForm.contact, F.data == "use_username")
+async def autofill_contact(
+    callback: CallbackQuery, state: FSMContext
+) -> None:
+    username = callback.from_user.username
+    if username:
+        await state.update_data(contact=f"@{username}")
+        await callback.message.delete()
+        await callback.message.answer("Когда с вами удобно связаться?")
+        await state.set_state(ServiceForm.time)
+    else:
+        await callback.message.edit_text(
+            "\u2757 \u0423 \u0432\u0430\u0441 \u043d\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d username \u0432 Telegram. \u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u0432\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0440\u0443\u0447\u043d\u043e.",
+            reply_markup=None,
+        )
+    await callback.answer()
+
+
+@router.callback_query(ServiceForm.contact, F.data == "enter_contact")
+async def ask_manual_contact(callback: CallbackQuery) -> None:
+    await callback.message.edit_text("Укажите телефон или Telegram:")
+    await callback.answer()
 
 
 @router.message(ServiceForm.contact)

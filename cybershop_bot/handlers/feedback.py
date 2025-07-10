@@ -9,7 +9,7 @@ from ..db.operations import create_feedback
 from ..utils.storage import save_file
 from ..utils.notifications import send_notifications
 from cybershop_bot.config import Settings
-from ..keyboards.menu import to_menu_kb
+from ..keyboards.menu import to_menu_kb, contact_choice_kb
 
 router = Router()
 
@@ -47,8 +47,39 @@ async def process_screenshot(message: Message, state: FSMContext) -> None:
 async def process_order(message: Message, state: FSMContext) -> None:
     await state.update_data(order=message.text)
     await message.delete()
-    await message.answer("Телефон или Telegram:")
+    await message.answer(
+        "\U0001F4F1 \u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0435 \u043a\u043e\u043d\u0442\u0430\u043a\u0442 \u0434\u043b\u044f \u0441\u0432\u044f\u0437\u0438:",
+        reply_markup=contact_choice_kb(),
+    )
     await state.set_state(FeedbackForm.contact)
+
+
+@router.callback_query(FeedbackForm.contact, F.data == "use_username")
+async def autofill_contact_feedback(
+    callback: CallbackQuery,
+    state: FSMContext,
+    session: AsyncSession,
+    bot,
+    settings: Settings,
+) -> None:
+    username = callback.from_user.username
+    if not username:
+        await callback.message.edit_text(
+            "\u2757 \u0423 \u0432\u0430\u0441 \u043d\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043b\u0435\u043d username \u0432 Telegram. \u041f\u043e\u0436\u0430\u043b\u0443\u0439\u0441\u0442\u0430, \u0432\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0440\u0443\u0447\u043d\u043e.",
+            reply_markup=None,
+        )
+        await callback.answer()
+        return
+    await state.update_data(contact=f"@{username}")
+    await callback.message.delete()
+    await _finalize_feedback(callback.message, state, session, bot, settings)
+    await callback.answer()
+
+
+@router.callback_query(FeedbackForm.contact, F.data == "enter_contact")
+async def ask_manual_contact_feedback(callback: CallbackQuery) -> None:
+    await callback.message.edit_text("Телефон или Telegram:")
+    await callback.answer()
 
 
 @router.message(FeedbackForm.contact)
@@ -61,6 +92,16 @@ async def finish_feedback(
 ) -> None:
     await state.update_data(contact=message.text)
     await message.delete()
+    await _finalize_feedback(message, state, session, bot, settings)
+
+
+async def _finalize_feedback(
+    message: Message,
+    state: FSMContext,
+    session: AsyncSession,
+    bot,
+    settings: Settings,
+) -> None:
     data = await state.get_data()
     fb = await create_feedback(
         session,
