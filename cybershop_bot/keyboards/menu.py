@@ -46,6 +46,15 @@ def back_service_kb() -> InlineKeyboardMarkup:
     )
 
 
+def heat_info_kb() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="\U0001F6E0 \u0417\u0430\u043f\u0438\u0441\u0430\u0442\u044C\u0441\u044f \u043d\u0430 \u0422\u041E", callback_data="maintenance")],
+            [InlineKeyboardButton(text="\u21a9\ufe0f \u041d\u0430\u0437\u0430\u0434", callback_data="service")],
+        ]
+    )
+
+
 def tradein_kb() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[[InlineKeyboardButton(text="\U0001F4E5 \u0421\u0434\u0430\u0442\u044c \u0442\u0435\u0445\u043d\u0438\u043a\u0443", callback_data="tradein_form")],
