@@ -9,7 +9,14 @@ from ..db.operations import create_feedback
 from ..utils.storage import save_file
 from ..utils.notifications import send_notifications
 from cybershop_bot.config import Settings
-from ..keyboards.menu import to_menu_kb, contact_choice_kb, manual_contact_kb, back_menu_kb
+from ..keyboards.menu import (
+    to_menu_kb,
+    contact_choice_kb,
+    manual_contact_kb,
+    back_menu_kb,
+    cancel_kb,
+    with_cancel,
+)
 
 router = Router()
 
@@ -31,7 +38,10 @@ class FeedbackForm(StatesGroup):
 @router.callback_query(F.data == "feedback_form")
 async def start_feedback(callback: CallbackQuery, state: FSMContext) -> None:
     await callback.message.delete()
-    await callback.message.answer("Прикрепите скрин отзыва")
+    await callback.message.answer(
+        "Прикрепите скрин отзыва",
+        reply_markup=cancel_kb(),
+    )
     await state.set_state(FeedbackForm.screenshot)
     await callback.answer()
 
@@ -47,7 +57,7 @@ async def process_screenshot(message: Message, state: FSMContext) -> None:
     path = save_file(downloaded, filename, 'feedback')
     await state.update_data(screenshot=path)
     await message.delete()
-    await message.answer("Модель или номер заказа:")
+    await message.answer("Модель или номер заказа:", reply_markup=cancel_kb())
     await state.set_state(FeedbackForm.order)
 
 
@@ -57,7 +67,7 @@ async def process_order(message: Message, state: FSMContext) -> None:
     await message.delete()
     await message.answer(
         "\U0001F4F1 \u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u0435 \u043a\u043e\u043d\u0442\u0430\u043a\u0442 \u0434\u043b\u044f \u0441\u0432\u044f\u0437\u0438:",
-        reply_markup=contact_choice_kb(),
+        reply_markup=with_cancel(contact_choice_kb()),
     )
     await state.set_state(FeedbackForm.contact)
 
@@ -81,7 +91,8 @@ async def autofill_contact_feedback(
 @router.callback_query(FeedbackForm.contact, F.data == "enter_contact")
 async def ask_manual_contact_feedback(callback: CallbackQuery) -> None:
     await callback.message.edit_text(
-        "Телефон или Telegram:", reply_markup=manual_contact_kb()
+        "Телефон или Telegram:",
+        reply_markup=with_cancel(manual_contact_kb()),
     )
     await callback.answer()
 
