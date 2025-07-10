@@ -12,6 +12,7 @@ from ..db.operations import (
 from ..utils.notifications import send_notifications
 from cybershop_bot.config import Settings
 from ..keyboards.menu import to_menu_kb, contact_choice_kb
+from ..keyboards.time import generate_time_slots
 
 router = Router()
 
@@ -51,7 +52,10 @@ async def autofill_contact(
     if username:
         await state.update_data(contact=f"@{username}")
         await callback.message.delete()
-        await callback.message.answer("Когда с вами удобно связаться?")
+        await callback.message.answer(
+            "\u23F0 \u041a\u043e\u0433\u0434\u0430 \u0432\u0430\u043c \u0443\u0434\u043e\u0431\u043d\u043e, \u0447\u0442\u043e\u0431\u044b \u043c\u044b \u0441 \u0432\u0430\u043c\u0438 \u0441\u0432\u044f\u0437\u0430\u043b\u0438\u0441\u044c?\n\n\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0443\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u043d\u0438\u0436\u0435:",
+            reply_markup=generate_time_slots(),
+        )
         await state.set_state(ServiceForm.time)
     else:
         await callback.message.edit_text(
@@ -71,21 +75,26 @@ async def ask_manual_contact(callback: CallbackQuery) -> None:
 async def process_contact(message: Message, state: FSMContext) -> None:
     await state.update_data(contact=message.text)
     await message.delete()
-    await message.answer("Когда с вами удобно связаться?")
+    await message.answer(
+        "\u23F0 \u041a\u043e\u0433\u0434\u0430 \u0432\u0430\u043c \u0443\u0434\u043e\u0431\u043d\u043e, \u0447\u0442\u043e\u0431\u044b \u043c\u044b \u0441 \u0432\u0430\u043c\u0438 \u0441\u0432\u044f\u0437\u0430\u043b\u0438\u0441\u044c?\n\n\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0443\u0434\u043e\u0431\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f \u043d\u0438\u0436\u0435:",
+        reply_markup=generate_time_slots(),
+    )
     await state.set_state(ServiceForm.time)
 
 
-@router.message(ServiceForm.time)
+@router.callback_query(ServiceForm.time, F.data.startswith("time_"))
 async def process_time(
-    message: Message,
+    callback: CallbackQuery,
     state: FSMContext,
     session: AsyncSession,
     bot,
     settings: Settings,
 ) -> None:
-    await state.update_data(time=message.text)
-    await message.delete()
-    await finish_service(message, state, session, bot, settings)
+    time_raw = callback.data.split("_", 1)[1].replace("_", ":")
+    await state.update_data(time=time_raw)
+    await callback.message.delete()
+    await finish_service(callback.message, state, session, bot, settings)
+    await callback.answer()
 
 
 async def finish_service(

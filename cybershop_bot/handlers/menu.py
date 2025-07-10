@@ -70,10 +70,11 @@ FEEDBACK_INFO = (
     "После проверки гарантия будет продлена."
 )
 LOCATION_TEXT = (
-    "\U0001F4CD Мы находимся по адресу:\n"
-    "Москва, ул. Примерная, д. 5, офис 21\n"
-    "\U0001F687 Метро Технопарк\n"
-    "\U0001F553 Ежедневно с 10:00 до 20:00"
+    "\U0001F4CD \u041c\u044b \u043d\u0430\u0445\u043e\u0434\u0438\u043c\u0441\u044f \u043f\u043e \u0430\u0434\u0440\u0435\u0441\u0443:\n"
+    "\u041c\u043e\u0441\u043a\u0432\u0430, \u0411\u0443\u0434\u0430\u0439\u0441\u043a\u0438\u0439 \u043f\u0440\u043e\u0435\u0437\u0434, \u0434. 7, \u043a\u043e\u0440\u043f. 1\n"
+    "\U0001F4E6 \u041f\u043e\u0434\u044a\u0435\u0437\u0434 3, \u044d\u0442\u0430\u0436 -1\n"
+    "\U0001F687 \u041c\u0426\u041a \u0420\u043e\u0441\u0442\u043e\u043a\u0438\u043d\u043e\n"
+    "\u23F0 \u0413\u0440\u0430\u0444\u0438\u043a \u0440\u0430\u0431\u043e\u0442\u044b: \u0435\u0436\u0435\u0434\u043d\u0435\u0432\u043d\u043e \u0441 10:00 \u0434\u043e 20:00"
 )
 CONTACT_TEXT = (
     "\U0001F64B\u200D♂️ Не нашли нужную информацию?\n\n"
@@ -138,5 +139,8 @@ async def contact_info(callback: CallbackQuery) -> None:
 
 @router.callback_query(F.data == "copy_addr")
 async def copy_addr(callback: CallbackQuery) -> None:
-    await callback.answer("Адрес скопирован")
-    await callback.message.answer("Москва, ул. Примерная, д. 5, офис 21")
+    await callback.message.answer(
+        "\U0001F4CB \u0410\u0434\u0440\u0435\u0441:\n"
+        "\u041c\u043e\u0441\u043a\u0432\u0430, \u0411\u0443\u0434\u0430\u0439\u0441\u043a\u0438\u0439 \u043f\u0440\u043e\u0435\u0437\u0434, \u0434. 7, \u043a\u043e\u0440\u043f. 1, \u043f\u043e\u0434\u044a\u0435\u0437\u0434 3, \u044d\u0442\u0430\u0436 -1"
+    )
+    await callback.answer()
